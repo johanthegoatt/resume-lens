@@ -1,0 +1,4 @@
+Skills: JavaScript TypeScript React Node SQL Testing Docker
+Experience: Built a real-time collaboration system and improved API latency.
+Projects: Mind mapping board, route simulator, and portfolio generator.
+Education: Bachelor of Science in Computer Science.
