@@ -1,4 +1,5 @@
 import { requiredSections, roleRubrics } from "./rubric.js";
+import { detectSections } from "./sections.js";
 
 function tokenize(text) {
   return text
@@ -39,7 +40,7 @@ function keywordBreakdown(tokens, rubricKeywords) {
 }
 
 function sectionBreakdown(text, sectionWeights) {
-  const lower = text.toLowerCase();
+  const { found, unrecognised } = detectSections(text);
   let earned = 0;
   let possible = 0;
   const present = [];
@@ -47,7 +48,7 @@ function sectionBreakdown(text, sectionWeights) {
 
   for (const [section, weight] of Object.entries(sectionWeights)) {
     possible += weight;
-    if (lower.includes(section)) {
+    if (found.has(section)) {
       earned += weight;
       present.push(section);
     } else {
@@ -60,6 +61,7 @@ function sectionBreakdown(text, sectionWeights) {
     possible,
     present,
     missing,
+    unrecognised,
     score: possible > 0 ? Math.round((earned / possible) * 100) : 0
   };
 }
@@ -77,6 +79,12 @@ function suggestionList(sectionStats, keywordStats) {
 
   if (sectionStats.missing.length > 0) {
     suggestions.push(`Add missing sections: ${sectionStats.missing.join(", ")}.`);
+  }
+
+  if (sectionStats.unrecognised.length > 0) {
+    suggestions.push(
+      `Rename headings a parser will not recognise: ${sectionStats.unrecognised.slice(0, 3).join(", ")}.`
+    );
   }
 
   if (keywordStats.misses.length > 0) {
