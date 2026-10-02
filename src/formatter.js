@@ -14,6 +14,12 @@ export function formatSummary(result) {
     `Readability Score: ${percent(result.breakdown.readability.score)}`,
     `Achievement Score: ${percent(result.breakdown.achievements.score)}`,
     `Keyword Hits: ${keywordHits}`,
+    ...(result.jobMatch
+      ? [
+          `Job Match: ${percent(result.jobMatch.score)}`,
+          `Job Terms Missing: ${result.jobMatch.missing.join(", ") || "none"}`
+        ]
+      : []),
     `Missing Sections: ${missingSections}`,
     "Suggestions:",
     ...result.suggestions.map((line) => `- ${line}`)

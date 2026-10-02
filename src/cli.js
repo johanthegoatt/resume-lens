@@ -15,7 +15,7 @@ function sampleResume() {
 function usage() {
   console.log("Usage:");
   console.log("  node src/cli.js [resumePath] [role]");
-  console.log("  node src/cli.js --input <resumePath> --role <role> --format <json|summary> [--output <path>]");
+  console.log("  node src/cli.js --input <resumePath> --role <role> --format <json|summary> [--jd <jobDescriptionPath>] [--output <path>]");
 }
 
 function parseArgs(argv) {
@@ -24,6 +24,7 @@ function parseArgs(argv) {
     role: "fullstack",
     format: "json",
     output: "",
+    jd: "",
     help: false
   };
   const positional = [];
@@ -50,6 +51,12 @@ function parseArgs(argv) {
     if (token === "--format" || token === "-f") {
       index += 1;
       options.format = argv[index] || "json";
+      continue;
+    }
+
+    if (token === "--jd" || token === "-j") {
+      index += 1;
+      options.jd = argv[index] || "";
       continue;
     }
 
@@ -86,7 +93,8 @@ function main() {
     resumeText = fs.readFileSync(absolute, "utf8");
   }
 
-  const result = analyzeResume(resumeText, options.role);
+  const jobDescription = options.jd ? fs.readFileSync(path.resolve(process.cwd(), options.jd), "utf8") : "";
+  const result = analyzeResume(resumeText, options.role, { jobDescription });
   const format = options.format.toLowerCase();
 
   let outputText = "";

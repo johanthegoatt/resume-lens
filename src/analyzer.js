@@ -2,6 +2,7 @@ import { requiredSections, roleRubrics } from "./rubric.js";
 import { detectSections } from "./sections.js";
 import { findKeyword } from "./aliases.js";
 import { achievementSignal } from "./bullets.js";
+import { jobMatch } from "./jobmatch.js";
 
 function tokenize(text) {
   return text
@@ -115,7 +116,7 @@ function suggestionList(sectionStats, keywordStats, achievements) {
   return suggestions;
 }
 
-export function analyzeResume(text, role = "fullstack") {
+export function analyzeResume(text, role = "fullstack", { jobDescription = "" } = {}) {
   const safeRole = roleRubrics[role] ? role : "fullstack";
   const rubric = roleRubrics[safeRole];
 
@@ -133,6 +134,12 @@ export function analyzeResume(text, role = "fullstack") {
     achievements.score * 0.1
   );
 
+  const job = jobDescription ? jobMatch(text, jobDescription) : null;
+  const suggestions = suggestionList(sectionStats, keywordStats, achievements);
+  if (job && job.missing.length > 0) {
+    suggestions.unshift(`Terms the job description stresses that the resume never uses: ${job.missing.slice(0, 6).join(", ")}.`);
+  }
+
   return {
     role: safeRole,
     score: overall,
@@ -145,7 +152,8 @@ export function analyzeResume(text, role = "fullstack") {
       },
       achievements
     },
+    jobMatch: job,
     requiredSections,
-    suggestions: suggestionList(sectionStats, keywordStats, achievements)
+    suggestions
   };
 }

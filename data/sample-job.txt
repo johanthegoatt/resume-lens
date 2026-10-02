@@ -1,0 +1,5 @@
+Full-stack engineer, payments platform.
+You will build TypeScript services on Node.js and a React dashboard.
+Own PostgreSQL schema changes and write integration tests for every endpoint.
+Experience with Kubernetes, observability and idempotent payment APIs.
+Bonus: Kafka, Terraform, on-call experience.
