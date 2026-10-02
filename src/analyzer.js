@@ -1,6 +1,7 @@
 import { requiredSections, roleRubrics } from "./rubric.js";
 import { detectSections } from "./sections.js";
 import { findKeyword } from "./aliases.js";
+import { achievementSignal } from "./bullets.js";
 
 function tokenize(text) {
   return text
@@ -79,7 +80,7 @@ function brevityScore(wordCount) {
   return 58;
 }
 
-function suggestionList(sectionStats, keywordStats) {
+function suggestionList(sectionStats, keywordStats, achievements) {
   const suggestions = [];
 
   if (sectionStats.missing.length > 0) {
@@ -103,33 +104,15 @@ function suggestionList(sectionStats, keywordStats) {
     suggestions.push(`Consider role keywords: ${keywordStats.misses.slice(0, 6).join(", ")}.`);
   }
 
+  for (const bullet of achievements.weakest) {
+    suggestions.push(`Bullet "${bullet.text.slice(0, 48)}" is missing: ${bullet.missing.join(", ")}.`);
+  }
+
   if (suggestions.length === 0) {
     suggestions.push("Good baseline coverage. Next step: replace generic bullets with measurable outcomes.");
   }
 
   return suggestions;
-}
-
-function achievementSignal(text) {
-  const lines = String(text)
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean);
-  const bulletLines = lines.filter((line) => /^[-*•]/.test(line));
-  if (bulletLines.length === 0) {
-    return {
-      bulletLines: 0,
-      quantifiedBullets: 0,
-      score: 45
-    };
-  }
-  const quantifiedBullets = bulletLines.filter((line) => /\d/.test(line)).length;
-  const ratio = quantifiedBullets / bulletLines.length;
-  return {
-    bulletLines: bulletLines.length,
-    quantifiedBullets,
-    score: Math.round(ratio * 100)
-  };
 }
 
 export function analyzeResume(text, role = "fullstack") {
@@ -163,6 +146,6 @@ export function analyzeResume(text, role = "fullstack") {
       achievements
     },
     requiredSections,
-    suggestions: suggestionList(sectionStats, keywordStats)
+    suggestions: suggestionList(sectionStats, keywordStats, achievements)
   };
 }
