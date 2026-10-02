@@ -1,5 +1,6 @@
 import { requiredSections, roleRubrics } from "./rubric.js";
 import { detectSections } from "./sections.js";
+import { findKeyword } from "./aliases.js";
 
 function tokenize(text) {
   return text
@@ -19,12 +20,15 @@ function keywordBreakdown(tokens, rubricKeywords) {
   let possible = 0;
   const hits = [];
   const misses = [];
+  const viaAlias = {};
 
   for (const [keyword, weight] of Object.entries(rubricKeywords)) {
     possible += weight;
-    if (tokenSet.has(keyword)) {
+    const match = findKeyword(tokens, tokenSet, keyword);
+    if (match) {
       earned += weight;
       hits.push(keyword);
+      if (match !== "exact") viaAlias[keyword] = match;
     } else {
       misses.push(keyword);
     }
@@ -35,6 +39,7 @@ function keywordBreakdown(tokens, rubricKeywords) {
     possible,
     hits,
     misses,
+    viaAlias,
     score: possible > 0 ? Math.round((earned / possible) * 100) : 0
   };
 }
@@ -85,6 +90,13 @@ function suggestionList(sectionStats, keywordStats) {
     suggestions.push(
       `Rename headings a parser will not recognise: ${sectionStats.unrecognised.slice(0, 3).join(", ")}.`
     );
+  }
+
+  const aliasOnly = Object.entries(keywordStats.viaAlias);
+  if (aliasOnly.length > 0) {
+    // Many ATS filters match keywords literally, so spell out the canonical term too.
+    const pairs = aliasOnly.slice(0, 4).map(([keyword, alias]) => `${keyword} (found as "${alias}")`);
+    suggestions.push(`Also write the exact term for: ${pairs.join(", ")}.`);
   }
 
   if (keywordStats.misses.length > 0) {
