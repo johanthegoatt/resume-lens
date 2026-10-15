@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.0 - 2026-10-15
+
+- `--input` and `--jd` read .docx files directly; PDFs and old .doc files get a clear "save as .docx" message.
+- C++, C#, F#, .NET and ASP.NET are kept as skills, and "Node.js" in a job description no longer counts as a JavaScript requirement.
+- An unknown `--role` is an error listing the real roles instead of a silent fallback to fullstack.
+
 ## 1.2.0 - 2026-10-02
 
 - Sections count only under a heading line, using the standard variants ATS parsers route; creative headings are flagged for renaming.

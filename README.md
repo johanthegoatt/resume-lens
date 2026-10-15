@@ -11,7 +11,7 @@ Resume Lens is a local heuristic resume analyzer that scores resumes against rol
 - Job-description match (`--jd`) weighted with the BM25 term-frequency curve
 - Transparent breakdown for keywords, section coverage, and readability
 - Actionable suggestions for missing sections or weak keyword coverage
-- CLI for evaluating text files or a built-in sample resume
+- CLI for evaluating plain text or .docx files (read directly, no converter needed) or a built-in sample resume
 - Local-only processing with no external APIs
 
 ## Run

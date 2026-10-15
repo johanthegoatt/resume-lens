@@ -3,6 +3,17 @@ import path from "node:path";
 import { analyzeResume } from "./analyzer.js";
 import { formatSummary } from "./formatter.js";
 import { roleRubrics } from "./rubric.js";
+import { docxText } from "./docx.js";
+
+// .docx is read directly; anything else is taken as plain text.
+function readDocument(file) {
+  const absolute = path.resolve(process.cwd(), file);
+  if (/\.docx$/i.test(file)) return docxText(fs.readFileSync(absolute));
+  if (/\.(pdf|doc|pages)$/i.test(file)) {
+    throw new Error(`Can't read ${path.extname(file)} files. Save the resume as .docx or plain text and try again.`);
+  }
+  return fs.readFileSync(absolute, "utf8");
+}
 
 function sampleResume() {
   return [
@@ -97,11 +108,10 @@ function main() {
   let resumeText = sampleResume();
 
   if (options.input) {
-    const absolute = path.resolve(process.cwd(), options.input);
-    resumeText = fs.readFileSync(absolute, "utf8");
+    resumeText = readDocument(options.input);
   }
 
-  const jobDescription = options.jd ? fs.readFileSync(path.resolve(process.cwd(), options.jd), "utf8") : "";
+  const jobDescription = options.jd ? readDocument(options.jd) : "";
   const result = analyzeResume(resumeText, role, { jobDescription });
   const format = options.format.toLowerCase();
 
