@@ -41,3 +41,17 @@ test("analyzeResume carries job match into suggestions and summary", () => {
   assert.equal(formatSummary(result).includes("Job Match:"), true);
   assert.equal(analyzeResume("React", "frontend").jobMatch, null);
 });
+
+test("C++, C# and .NET survive tokenising and Node.js is not a JavaScript requirement", () => {
+  const cpp = jobMatch("Skills: C, Java", "Must know C++ and C#. .NET a plus.");
+  assert.deepEqual(cpp.matched, []);
+  assert.deepEqual(cpp.missing.slice(0, 3).sort(), ["cplusplus", "csharp", "dotnet"]);
+
+  const node = jobMatch("Skills: JavaScript", "We need Node.js developers");
+  assert.equal(node.matched.includes("javascript"), false);
+  assert.equal(node.missing.includes("node"), true);
+  assert.equal(node.missing.includes("developers"), false);
+
+  const ok = jobMatch("Built services in C# on ASP.NET and Node.js", "C#, ASP.NET, NodeJS");
+  assert.equal(ok.score, 100);
+});

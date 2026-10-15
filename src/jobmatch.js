@@ -1,4 +1,4 @@
-import { keywordAliases } from "./aliases.js";
+import { keywordAliases, normalizeTech } from "./aliases.js";
 
 // Compares a resume with a pasted job description. Each job-description term
 // gets a weight from two parts:
@@ -32,6 +32,11 @@ const STOPWORDS = new Set(
 const SPELLING = new Map([
   ["nodejs", "node"],
   ["reactjs", "react"],
+  ["vuejs", "vue"],
+  ["angularjs", "angular"],
+  ["expressjs", "express"],
+  ["developers", "developer"],
+  ["engineers", "engineer"],
   ["js", "javascript"],
   ["ts", "typescript"],
   ["postgres", "postgresql"],
@@ -43,7 +48,8 @@ const SPELLING = new Map([
 const EXTRA_SKILLS =
   "aws gcp azure kafka redis terraform kubernetes graphql rest grpc go rust java kotlin swift " +
   "postgresql mongodb elasticsearch observability prometheus grafana ci cd linux nextjs vue " +
-  "svelte angular figma webpack vite microservices idempotent oauth security payments llm";
+  "svelte angular figma webpack vite microservices idempotent oauth security payments llm " +
+  "cplusplus csharp fsharp dotnet aspnet express nuxtjs threejs d3js";
 
 const SKILLS = new Set([
   ...Object.keys(keywordAliases),
@@ -52,7 +58,7 @@ const SKILLS = new Set([
 ]);
 
 function terms(text) {
-  return String(text)
+  return normalizeTech(text)
     .toLowerCase()
     .replace(/[^a-z0-9\s]/g, " ")
     .split(/\s+/)

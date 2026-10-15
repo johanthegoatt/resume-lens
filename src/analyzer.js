@@ -1,11 +1,11 @@
 import { requiredSections, roleRubrics } from "./rubric.js";
 import { detectSections } from "./sections.js";
-import { findKeyword } from "./aliases.js";
+import { findKeyword, normalizeTech } from "./aliases.js";
 import { achievementSignal } from "./bullets.js";
 import { jobMatch } from "./jobmatch.js";
 
 function tokenize(text) {
-  return text
+  return normalizeTech(text)
     .toLowerCase()
     .replace(/[^a-z0-9\s]/g, " ")
     .split(/\s+/)
