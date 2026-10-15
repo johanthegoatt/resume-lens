@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { analyzeResume } from "./analyzer.js";
 import { formatSummary } from "./formatter.js";
+import { roleRubrics } from "./rubric.js";
 
 function sampleResume() {
   return [
@@ -86,6 +87,13 @@ function main() {
     return;
   }
 
+  // The analyzer falls back to fullstack for an unknown role, which from the
+  // command line meant a typo like "datas" silently scored the wrong rubric.
+  const role = options.role.toLowerCase();
+  if (!roleRubrics[role]) {
+    throw new Error(`Unknown role "${options.role}". Choose one of: ${Object.keys(roleRubrics).join(", ")}.`);
+  }
+
   let resumeText = sampleResume();
 
   if (options.input) {
@@ -94,7 +102,7 @@ function main() {
   }
 
   const jobDescription = options.jd ? fs.readFileSync(path.resolve(process.cwd(), options.jd), "utf8") : "";
-  const result = analyzeResume(resumeText, options.role, { jobDescription });
+  const result = analyzeResume(resumeText, role, { jobDescription });
   const format = options.format.toLowerCase();
 
   let outputText = "";
